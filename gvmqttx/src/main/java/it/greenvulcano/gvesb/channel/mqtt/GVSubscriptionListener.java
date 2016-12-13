@@ -28,6 +28,8 @@ import it.greenvulcano.gvesb.buffer.GVBuffer;
 import it.greenvulcano.gvesb.channel.mqtt.MqttChannel;
 import it.greenvulcano.gvesb.core.GreenVulcano;
 import it.greenvulcano.gvesb.core.exc.GVCoreException;
+import it.greenvulcano.gvesb.core.pool.GreenVulcanoPool;
+import it.greenvulcano.gvesb.core.pool.GreenVulcanoPoolManager;
 import it.greenvulcano.gvesb.log.GVBufferMDC;
 
 public class GVSubscriptionListener implements MqttChannel.SubscriptionListener {
@@ -99,11 +101,11 @@ public class GVSubscriptionListener implements MqttChannel.SubscriptionListener 
 	
 	class GreenVulcanoTask implements Runnable {
 
-		private final GreenVulcano greenVulcano;
+		private final GreenVulcanoPool greenVulcano;
 		private final MqttMessage message;
 		
 		GreenVulcanoTask(MqttMessage message) throws GVCoreException{
-			this.greenVulcano = new GreenVulcano();
+			this.greenVulcano = GreenVulcanoPoolManager.instance().getGreenVulcanoPool("gvmqtt").orElseGet(GreenVulcanoPoolManager::getDefaultGreenVulcanoPool);
 			this.message = message;
 		}
 		
