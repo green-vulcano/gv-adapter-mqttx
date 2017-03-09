@@ -1,2 +1,5 @@
 # gv-adapter-mqttx
-Extended MQTT Adapter for GreenVulcano
+### GreenVulcano ESB v4 MQTT extension
+Support the integration of MQTT systems including call operations:
+* `mqtt-publish-call`
+* `mqtt-subscribe-listener`
