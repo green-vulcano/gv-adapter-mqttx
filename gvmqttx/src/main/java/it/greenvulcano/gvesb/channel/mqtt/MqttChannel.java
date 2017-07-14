@@ -25,12 +25,14 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
@@ -54,15 +56,22 @@ public class MqttChannel implements MqttCallback {
 	private final MqttClient mqttClient;		
 	private final Set<SubscriptionListener> listeners;
 	
-	MqttChannel(String endpoint, String id, String system) throws MqttException {
+	MqttChannel(String protocol, String host, int port, String username, char[] password, String id, String system) throws MqttException {
 		this.id = id;
 		this.system = system;
+		String endpoint = protocol+"://"+host+":"+port;
 		logger.debug(String.format("GVESB Creating MQTT channel %s/%s on endpoint %s ", system, id, endpoint));
 		listeners = Collections.synchronizedSet(new LinkedHashSet<>());
 		
 		mqttClient = new MqttClient(endpoint, system+"/"+id);		
 		mqttClient.setCallback(this);
-		mqttClient.connect();		
+		
+		MqttConnectOptions connectOptions = new MqttConnectOptions();
+		
+		Optional.ofNullable(username).ifPresent(connectOptions::setUserName);
+		Optional.ofNullable(password).ifPresent(connectOptions::setPassword);
+		
+		mqttClient.connect(connectOptions);		
 		
 	}
 	

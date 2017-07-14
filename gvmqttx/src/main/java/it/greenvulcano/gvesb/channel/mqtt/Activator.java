@@ -19,6 +19,7 @@
  *******************************************************************************/
 package it.greenvulcano.gvesb.channel.mqtt;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -75,7 +76,23 @@ public class Activator implements BundleActivator {
     private Optional<MqttChannel> buildChannel(Node node) {
 		 MqttChannel mqttChannel = null;
 		 try {
-			mqttChannel = new MqttChannel(XMLConfig.get(node, "@endpoint"), XMLConfig.get(node, "@id-channel"), XMLConfig.get(node.getParentNode(), "@id-system"));        		 
+			 
+			URI endpoint = URI.create(XMLConfig.get(node, "@endpoint"));
+			
+			String userInfo = endpoint.getRawUserInfo();
+			
+			String username = null;
+			char[] password = null;
+			if (userInfo!=null) {
+				String[] credentials = userInfo.split(":");
+				username =  credentials[0];
+				if(credentials.length>1) {
+					password = credentials[1].toCharArray();	
+				}
+				
+			}
+			
+			mqttChannel = new MqttChannel(endpoint.getScheme(), endpoint.getHost(), endpoint.getPort(), username, password,  XMLConfig.get(node, "@id-channel"), XMLConfig.get(node.getParentNode(), "@id-system"));        		 
 			
 			NodeList listeners = XMLConfig.getNodeList(node, "./mqtt-subscribe-listener");
 			logger.debug("Found "+ listeners.getLength() + " Listenter for channel "+mqttChannel.getSystem()+"/"+mqttChannel.getId());

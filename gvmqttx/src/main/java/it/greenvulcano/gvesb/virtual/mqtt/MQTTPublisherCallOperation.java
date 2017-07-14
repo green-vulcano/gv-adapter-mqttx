@@ -29,7 +29,6 @@ import it.greenvulcano.gvesb.virtual.ConnectionException;
 import it.greenvulcano.gvesb.virtual.InitializationException;
 import it.greenvulcano.gvesb.virtual.InvalidDataException;
 import it.greenvulcano.gvesb.virtual.OperationKey;
-import it.greenvulcano.util.json.JSONUtils;
 import it.greenvulcano.util.metadata.PropertiesHandler;
 import it.greenvulcano.util.xml.XMLUtils;
 
@@ -119,7 +118,7 @@ public class MQTTPublisherCallOperation implements CallOperation
                 payload = XMLUtils.serializeDOMToByteArray_S((Node) obj);
             }
             else if (obj instanceof JSONObject) {
-                payload = JSONUtils.serializeJSON((JSONObject) obj).getBytes();
+                payload = ((JSONObject) obj).toString().getBytes();
             }
             else {
                 throw new Exception("Invalid input type: " + (obj != null ? obj.getClass() : "null"));
